@@ -4,6 +4,11 @@ A working setup for the Cammus C5 direct-drive base in Forza Horizon 6: force fe
 C5 rim's buttons and the CP5 pedals, and the rim's display and LEDs fed by telemetry. Tested
 2026-10-23 with FH6 build 461691 (6.461, Steam) on Windows 11.
 
+**The main advantage: no Cammus Forza helper.** FH6 talks to the wheel directly, without the
+Forza / Horizon helper mode of the Cammus app, so without the frame drops users report with
+it. **The helper must be turned off** in the Cammus app (see [Cammus app](#cammus-app)); the
+Cammus app itself keeps running for the rim's display and LEDs.
+
 **Why** each part is needed: [docs/how-it-works.md](docs/how-it-works.md).
 
 > **Disclaimer.** The setup installs a DLL that hooks into the game process and modifies game
@@ -96,10 +101,11 @@ Cammus app listens on while FH6 runs). FH6 sends only while driving.
   packet has the same 324-byte format, no conversion is needed.
 - **FFB Invert: off** (the game's Invert Force Feedback does it; both on would cancel out).
 - Damping / friction / inertia: low. FH6 damps by itself, and base-side damping hides detail.
-- **Not needed:** the app's Forza / Horizon helper mode and Cammus's `horizonHelper` (a vJoy
-  relay written for an older base). Keep the helper mode off and start FH6 directly through
-  Steam: the helper mode is built to write Cammus's own versions of the game's profile zips,
-  which would undo part 2.
+- **Forza / Horizon helper: off.** This setup replaces it, so neither the app's helper mode
+  nor Cammus's `horizonHelper` (a vJoy relay written for an older base) is used, and with them
+  go the frame drops users report. It must stay off, not just unused: the helper mode is built
+  to write Cammus's own versions of the game's profile zips, which would undo part 2. Start
+  FH6 directly through Steam.
 - Windows' "preferred device" in `joy.cpl` makes no difference to FH6 (FH6 orders devices by
   Windows.Gaming.Input, where the pedals come first).
 
