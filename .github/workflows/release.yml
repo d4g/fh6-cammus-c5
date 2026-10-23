@@ -1,0 +1,48 @@
+# Builds and tests the DLL on every push and pull request; on a tag "v*" it also packages the
+# release zip (scripts/package.ps1) and publishes a GitHub release with the zip and its checksum.
+name: build-and-release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed only by the release step (creating the release)
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      # rustup >= 1.28 no longer installs the active toolchain implicitly; this installs the
+      # one pinned in dll/rust-toolchain.toml (stable-x86_64-pc-windows-gnu).
+      - name: Install Rust toolchain
+        working-directory: dll
+        run: rustup toolchain install
+
+      - name: Test
+        working-directory: dll
+        run: cargo test --locked
+
+      - name: Build
+        working-directory: dll
+        run: cargo build --release --locked
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { "dev-$($env:GITHUB_SHA.Substring(0, 7))" }
+          ./scripts/package.ps1 -Version $version
+          "PACKAGE=fh6-cammus-c5-$version" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME "dist/$env:PACKAGE.zip" "dist/$env:PACKAGE.zip.sha256" --title $env:GITHUB_REF_NAME --generate-notes --verify-tag
