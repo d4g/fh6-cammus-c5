@@ -92,6 +92,16 @@ FH6's Data Out sends the documented 324-byte packet, the same size and layout as
 app listens on `127.0.0.1:20779` while FH6 runs and drives the rim's display and LEDs from it;
 pointing FH6's Data Out there is all that is needed.
 
+## Considered and left out
+
+- **Volume on a rim knob.** FH6 has no input command for volume (none of its 288 commands
+  touches audio), and its separate music/radio, effects and engine levels are not reachable
+  from outside. The proxy could read the knob itself and set FH6's overall volume through
+  Windows' per-application volume, but that means an input-reading thread and two COM/WinRT
+  interfaces inside the game process, for a control that cannot target the radio alone. Left
+  out to keep the proxy small; a separate tool (e.g. AutoHotkey) can map a knob to the
+  Windows volume instead.
+
 ## Upstream
 
 The crash and the missing actuator switch are bugs in Windows (`pid.dll`,
