@@ -41,8 +41,12 @@ Then two things are set by hand: the in-game settings and the Cammus app (below)
 
 ## Install
 
-1. Close FH6.
-2. Run, in the folder with the files:
+1. Download `fh6-cammus-c5-<version>.zip` from the
+   [latest release](https://github.com/d4g/fh6-cammus-c5/releases/latest) and extract it.
+   The `.sha256` file next to it holds the zip's checksum
+   (`Get-FileHash fh6-cammus-c5-<version>.zip` must show the same value).
+2. Close FH6.
+3. Run, in the extracted folder:
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1
@@ -55,7 +59,7 @@ Then two things are set by hand: the in-game settings and the Cammus app (below)
    backs up files that are still original and refuses otherwise.
    Other options: `-Label` (at most 12 bytes), `-Languages` (string tables for the label,
    default `EN, DE`), `-SkipDll`, `-SkipProfile`, `-SkipLabel`.
-3. Make the in-game settings and the Cammus settings below.
+4. Make the in-game settings and the Cammus settings below.
 
 Do **not** remap buttons inside FH6 on this profile: changes to a default profile are not
 saved (they are gone after a restart), and saving them as a custom profile sends FFB to
