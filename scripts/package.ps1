@@ -30,7 +30,7 @@ if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -F
 New-Item -ItemType Directory -Force -Path $stage, "$stage\profile", "$stage\docs\images" | Out-Null
 
 Copy-Item -LiteralPath $dll -Destination $stage
-foreach ($f in 'install.ps1', 'uninstall.ps1', 'README.md', 'LICENSE') { Copy-Item -LiteralPath (Join-Path $root $f) -Destination $stage }
+foreach ($f in 'install.cmd', 'uninstall.cmd', 'install.ps1', 'uninstall.ps1', 'fh6-path.ps1', 'README.md', 'LICENSE') { Copy-Item -LiteralPath (Join-Path $root $f) -Destination $stage }
 Copy-Item -Path (Join-Path $root 'profile\*.xml') -Destination "$stage\profile"
 Copy-Item -Path (Join-Path $root 'docs\*.md') -Destination "$stage\docs"
 Copy-Item -Path (Join-Path $root 'docs\images\*.png') -Destination "$stage\docs\images"

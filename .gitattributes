@@ -4,3 +4,5 @@
 # keep it exactly as generated.
 profile/*.xml -text
 *.png binary
+# cmd.exe expects CRLF in batch files.
+*.cmd text eol=crlf

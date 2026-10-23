@@ -11,11 +11,15 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$GameDir = $(if ($env:FH6_DIR) { $env:FH6_DIR } else { "${env:ProgramFiles(x86)}\Steam\steamapps\common\ForzaHorizon6" }),
+    [string]$GameDir,   # default: $env:FH6_DIR, else found through Steam (fh6-path.ps1)
     [string]$BackupDir = $(if ($env:FH6_BACKUP_DIR) { $env:FH6_BACKUP_DIR } else { "$env:USERPROFILE\fh6-backup" })
 )
 
 $ErrorActionPreference = 'Stop'
+. "$PSScriptRoot\fh6-path.ps1"
+if (-not $GameDir) { $GameDir = Find-Fh6Dir }
+Write-Host "Game folder:   $GameDir"
+Write-Host "Backup folder: $BackupDir"
 if (Get-Process forzahorizon6 -ErrorAction SilentlyContinue) { throw 'Forza Horizon 6 is running. Close it first.' }
 if (-not (Test-Path -LiteralPath "$GameDir\forzahorizon6.exe")) { throw "No forzahorizon6.exe in '$GameDir'. Pass -GameDir or set FH6_DIR." }
 

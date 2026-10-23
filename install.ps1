@@ -14,7 +14,7 @@
     Why each part is needed: README.md and docs/how-it-works.md.
 
 .PARAMETER GameDir
-    FH6 folder. Default: $env:FH6_DIR, else Steam's default library.
+    FH6 folder. Default: $env:FH6_DIR, else found through Steam (see fh6-path.ps1).
 .PARAMETER BackupDir
     Folder for the untouched copies. Default: $env:FH6_BACKUP_DIR, else %USERPROFILE%\fh6-backup.
 .PARAMETER Label
@@ -27,7 +27,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$GameDir = $(if ($env:FH6_DIR) { $env:FH6_DIR } else { "${env:ProgramFiles(x86)}\Steam\steamapps\common\ForzaHorizon6" }),
+    [string]$GameDir,
     [string]$BackupDir = $(if ($env:FH6_BACKUP_DIR) { $env:FH6_BACKUP_DIR } else { "$env:USERPROFILE\fh6-backup" }),
     [string]$Label = 'CammusC5CP5',
     [string[]]$Languages = @('EN', 'DE'),
@@ -40,6 +40,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+. "$PSScriptRoot\fh6-path.ps1"
+if (-not $GameDir) { $GameDir = Find-Fh6Dir }
 
 # --- constants -------------------------------------------------------------------------------
 $SlotEntry = 'DefaultRawGameControllerMappingProfileLogitechG29.xml'

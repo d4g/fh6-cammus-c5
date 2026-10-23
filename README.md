@@ -11,7 +11,7 @@ C5 rim's buttons and the CP5 pedals, and the rim's display and LEDs fed by telem
 > own risk; everything can be undone (see [Undo](#undo)).
 
 > **After every FH6 update, and after Steam's "Verify integrity of game files": run
-> `install.ps1` again.** Both restore the game's files, which removes the profile and its
+> `install.cmd` again.** Both restore the game's files, which removes the profile and its
 > label; the DLL stays. After an **update**, delete the old backups first (see
 > [After an update](#after-an-fh6-update-or-verify-integrity-of-game-files)).
 
@@ -46,19 +46,18 @@ Then two things are set by hand: the in-game settings and the Cammus app (below)
    The `.sha256` file next to it holds the zip's checksum
    (`Get-FileHash fh6-cammus-c5-<version>.zip` must show the same value).
 2. Close FH6.
-3. Run, in the extracted folder:
+3. Double-click **`install.cmd`** in the extracted folder. It shows the game folder it found
+   and what it changed, and waits for a key at the end.
 
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1
-   ```
-
-   It needs only Windows PowerShell 5.1. If FH6 is not in Steam's default library, add
-   `-GameDir "D:\SteamLibrary\steamapps\common\ForzaHorizon6"` (or set the environment
-   variable `FH6_DIR`). Untouched copies of the changed game files go to
+   The game folder is found through Steam (its entry for FH6, else its library list). To
+   choose it yourself, run in a terminal
+   `install.cmd -GameDir "D:\SteamLibrary\steamapps\common\ForzaHorizon6"`, or set the
+   environment variable `FH6_DIR`. Untouched copies of the changed game files go to
    `%USERPROFILE%\fh6-backup` (`-BackupDir` or `FH6_BACKUP_DIR` to change); the script only
    backs up files that are still original and refuses otherwise.
    Other options: `-Label` (at most 12 bytes), `-Languages` (string tables for the label,
-   default `EN, DE`), `-SkipDll`, `-SkipProfile`, `-SkipLabel`.
+   default `EN, DE`), `-SkipDll`, `-SkipProfile`, `-SkipLabel`. `install.cmd` runs
+   `install.ps1`, which needs only Windows PowerShell 5.1.
 4. Make the in-game settings and the Cammus settings below.
 
 Do **not** remap buttons inside FH6 on this profile: changes to a default profile are not
@@ -109,15 +108,14 @@ Cammus app listens on while FH6 runs). FH6 sends only while driving.
 ![C5 rim button map](docs/images/c5-button-map.png)
 
 German version: [c5-button-map.de.png](docs/images/c5-button-map.de.png). Numbers are the rim's button
-indices as Windows.Gaming.Input reports them; FH6's own menu counts from 1 ("Device 3:
-Button 6" is button 5). The knobs send one button per click direction (17: 24/25,
-18: 38/39, 19: 48/49).
+indices as Windows reports them; FH6's own menu counts from 1 ("Device 3: Button 6" is
+button 5).
 
 Layout in short: paddles shift while driving and switch menu tabs; left D-pad = menu
 navigation / photo mode, Forza LINK, ANNA, radio; right D-pad = A/B/X/Y in Xbox positions
 (down OK, right back, left X, up Y) and horn, look back, activate, camera while driving;
-7 rewind; 5 handbrake; 6 pause; 1 telemetry overlay, knob 18 its pages (only while it is
-open); knob 17 radio; 15 convertible top; 14 map; 2 Hide & Seek ping.
+7 rewind; 5 handbrake; 6 pause; 1 telemetry overlay, bottom knob its pages (only while it
+is open); left knob radio; 15 convertible top; 14 map; 2 Hide & Seek ping.
 
 Rewind screen: 20 resume from here, 7 rewind farther, 21 cancel (FH6's rewind has no
 forward/back scrubbing).
@@ -127,9 +125,9 @@ forward/back scrubbing).
 Both restore the game's zips and string tables, which removes parts 2 and 3. The DLL is not a
 game file and stays.
 
-- **After "Verify integrity of game files":** run `install.ps1` again.
+- **After "Verify integrity of game files":** run `install.cmd` again.
 - **After an FH6 update:** delete the old copies in `%USERPROFILE%\fh6-backup` (or your
-  `-BackupDir`) first, since they belong to the previous version, then run `install.ps1`; it
+  `-BackupDir`) first, since they belong to the previous version, then run `install.cmd`; it
   backs up the new originals. If the update changed a file in a way the script does not
   expect, it stops with a message before changing that file.
 
@@ -138,12 +136,8 @@ Check that the DLL still patches: `%TEMP%\fh6-ffb-fix.log` should start with
 
 ## Undo
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File uninstall.ps1
-```
-
-Restores the backed-up game files and removes the DLL (same `-GameDir` / `-BackupDir` options
-as `install.ps1`). Steam's "Verify integrity of game files" restores the game files too, but
+Double-click **`uninstall.cmd`**. It restores the backed-up game files and removes the DLL
+(same `-GameDir` / `-BackupDir` options as `install.cmd`). Steam's "Verify integrity of game files" restores the game files too, but
 leaves the DLL.
 
 ## Development

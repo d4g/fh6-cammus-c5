@@ -83,8 +83,8 @@ TEXT = {
     "function": ("Function (driving | menu)", "Funktion (Fahren | Menü)"),
     "menu": ("Menu", "Menü"),
     "free": ("free", "frei"),
-    "footer": ("Blue = bound, grey = free. Knobs 17/18/19: one button per turn direction.",
-               "Blau = belegt, grau = frei. Regler 17/18/19: eine Taste pro Drehrichtung."),
+    "footer": ("Blue = bound, grey = free. The knobs send one button per turn direction.",
+               "Blau = belegt, grau = frei. Die Drehregler senden eine Taste pro Drehrichtung."),
 }
 # Duplicates of other menu bindings that would only clutter the legend.
 HIDDEN = re.compile(r"INPUTCMD_UI_(DPAD_|MAP_|BRICKCHALLENGES_)|INPUTCMD_(PREV|NEXT)_CATEGORY$")
