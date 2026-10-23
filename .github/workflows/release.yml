@@ -49,5 +49,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         # A tag with a suffix (v0.1.0-rc.1) becomes a pre-release.
         run: |
-          $extra = if ($env:GITHUB_REF_NAME.Contains('-')) { @('--prerelease') } else { @() }
+          # Build the array explicitly: `$x = if (...) { @('a') }` unrolls to a plain string,
+          # and splatting a string passes its single characters.
+          $extra = @()
+          if ($env:GITHUB_REF_NAME.Contains('-')) { $extra += '--prerelease' }
           gh release create $env:GITHUB_REF_NAME "dist/$env:PACKAGE.zip" "dist/$env:PACKAGE.zip.sha256" --title $env:GITHUB_REF_NAME --generate-notes --verify-tag @extra
