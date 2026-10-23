@@ -1,0 +1,6 @@
+# Text files are stored with LF in the repository.
+* text=auto
+# The profile is written into the game byte for byte (CRLF, no BOM, like FH6's own profiles):
+# keep it exactly as generated.
+profile/*.xml -text
+*.png binary

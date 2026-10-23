@@ -1,0 +1,5 @@
+# The GNU toolchain links with its bundled self-contained gcc/ld, so no Visual
+# Studio is needed. The MSVC toolchain would need link.exe, which this
+# workstation does not have. Built and tested with rustc 1.93.0.
+[toolchain]
+channel = "stable-x86_64-pc-windows-gnu"
