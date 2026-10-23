@@ -16,15 +16,16 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      # The GNU host toolchain links without Visual Studio. Current rustup rejects a host in
-      # rust-toolchain.toml, so it is selected here; this takes precedence over that file.
-      RUSTUP_TOOLCHAIN: stable-x86_64-pc-windows-gnu
+      # Same version as dll/rust-toolchain.toml, with the GNU host (links without Visual
+      # Studio). Current rustup rejects a host in that file, so it is selected here; this
+      # takes precedence over the file.
+      RUSTUP_TOOLCHAIN: 1.93.0-x86_64-pc-windows-gnu
     steps:
       - uses: actions/checkout@v7.0.1
 
       # rustup >= 1.28 no longer installs the active toolchain implicitly.
       - name: Install Rust toolchain
-        run: rustup toolchain install stable-x86_64-pc-windows-gnu --profile minimal
+        run: rustup toolchain install $env:RUSTUP_TOOLCHAIN --profile minimal
 
       - name: Test
         working-directory: dll
@@ -46,5 +47,7 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
+        # A tag with a suffix (v0.1.0-rc.1) becomes a pre-release.
         run: |
-          gh release create $env:GITHUB_REF_NAME "dist/$env:PACKAGE.zip" "dist/$env:PACKAGE.zip.sha256" --title $env:GITHUB_REF_NAME --generate-notes --verify-tag
+          $extra = if ($env:GITHUB_REF_NAME.Contains('-')) { @('--prerelease') } else { @() }
+          gh release create $env:GITHUB_REF_NAME "dist/$env:PACKAGE.zip" "dist/$env:PACKAGE.zip.sha256" --title $env:GITHUB_REF_NAME --generate-notes --verify-tag @extra

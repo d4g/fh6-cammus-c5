@@ -1,8 +1,10 @@
-# Build with the GNU host toolchain: it links with its bundled gcc/ld, so no Visual Studio is
-# needed (the MSVC toolchain would need link.exe). Current rustup does not accept a host in a
-# toolchain file's channel, so it is chosen when building:
-#   rustup toolchain install stable-x86_64-pc-windows-gnu
-#   cargo +stable-x86_64-pc-windows-gnu build --release
-# (CI sets RUSTUP_TOOLCHAIN instead.) Built and tested with rustc 1.93.0.
+# Rust 1.93.0 with the GNU host toolchain: it links with its bundled gcc/ld, so no Visual
+# Studio is needed (the MSVC toolchain would need link.exe). The version is pinned so local
+# and CI builds use the compiler the DLL was tested with; raise it deliberately, then retest
+# in the game. Current rustup does not accept a host in this file's channel, so the GNU host
+# is chosen when building:
+#   rustup toolchain install 1.93.0-x86_64-pc-windows-gnu
+#   cargo +1.93.0-x86_64-pc-windows-gnu build --release
+# (CI sets RUSTUP_TOOLCHAIN instead.)
 [toolchain]
-channel = "stable"
+channel = "1.93.0"

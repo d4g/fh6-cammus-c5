@@ -65,10 +65,10 @@ In short: Windows' FFB broker sends FH6's effects as **2-axis polar effects over
 ## Build
 
 ```powershell
-rustup toolchain install stable-x86_64-pc-windows-gnu   # once
+rustup toolchain install 1.93.0-x86_64-pc-windows-gnu   # once
 cd dll
-cargo +stable-x86_64-pc-windows-gnu build --release     # target\release\xinput1_3.dll
-cargo +stable-x86_64-pc-windows-gnu test
+cargo +1.93.0-x86_64-pc-windows-gnu build --release     # target\release\xinput1_3.dll
+cargo +1.93.0-x86_64-pc-windows-gnu test
 ```
 
 The GNU host toolchain links with its bundled gcc and needs no Visual Studio (the MSVC
