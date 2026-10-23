@@ -15,14 +15,16 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      # The GNU host toolchain links without Visual Studio. Current rustup rejects a host in
+      # rust-toolchain.toml, so it is selected here; this takes precedence over that file.
+      RUSTUP_TOOLCHAIN: stable-x86_64-pc-windows-gnu
     steps:
       - uses: actions/checkout@v7.0.1
 
-      # rustup >= 1.28 no longer installs the active toolchain implicitly; this installs the
-      # one pinned in dll/rust-toolchain.toml (stable-x86_64-pc-windows-gnu).
+      # rustup >= 1.28 no longer installs the active toolchain implicitly.
       - name: Install Rust toolchain
-        working-directory: dll
-        run: rustup toolchain install
+        run: rustup toolchain install stable-x86_64-pc-windows-gnu --profile minimal
 
       - name: Test
         working-directory: dll

@@ -151,7 +151,7 @@ leaves the DLL.
 Everything below is for changing the setup; installing does not need it.
 
 - **DLL:** source, build and switches in [dll/](dll/README.md)
-  (Rust, `stable-x86_64-pc-windows-gnu`, no Visual Studio). `install.ps1` takes the DLL from
+  (Rust, GNU toolchain `stable-x86_64-pc-windows-gnu`, no Visual Studio). `install.ps1` takes the DLL from
   next to itself or from `dll\target\release`.
 - **Layout:** defined as a table in [scripts/build_profile.py](scripts/build_profile.py), which
   generates [profile/DefaultRawGameControllerMappingProfileCammusC5.xml](profile/DefaultRawGameControllerMappingProfileCammusC5.xml);

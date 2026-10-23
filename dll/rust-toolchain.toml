@@ -1,5 +1,8 @@
-# The GNU toolchain links with its bundled self-contained gcc/ld, so no Visual
-# Studio is needed. The MSVC toolchain would need link.exe, which this
-# workstation does not have. Built and tested with rustc 1.93.0.
+# Build with the GNU host toolchain: it links with its bundled gcc/ld, so no Visual Studio is
+# needed (the MSVC toolchain would need link.exe). Current rustup does not accept a host in a
+# toolchain file's channel, so it is chosen when building:
+#   rustup toolchain install stable-x86_64-pc-windows-gnu
+#   cargo +stable-x86_64-pc-windows-gnu build --release
+# (CI sets RUSTUP_TOOLCHAIN instead.) Built and tested with rustc 1.93.0.
 [toolchain]
-channel = "stable-x86_64-pc-windows-gnu"
+channel = "stable"

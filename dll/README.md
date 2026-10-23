@@ -65,14 +65,16 @@ In short: Windows' FFB broker sends FH6's effects as **2-axis polar effects over
 ## Build
 
 ```powershell
+rustup toolchain install stable-x86_64-pc-windows-gnu   # once
 cd dll
-cargo build --release   # target\release\xinput1_3.dll
-cargo test
+cargo +stable-x86_64-pc-windows-gnu build --release     # target\release\xinput1_3.dll
+cargo +stable-x86_64-pc-windows-gnu test
 ```
 
-The toolchain is pinned to `stable-x86_64-pc-windows-gnu` in `rust-toolchain.toml`: it
-links with its bundled gcc and needs no Visual Studio. The crate has no dependencies;
-the Win32 declarations are hand-written in `src/sys.rs`.
+The GNU host toolchain links with its bundled gcc and needs no Visual Studio (the MSVC
+toolchain would need `link.exe`). It is chosen on the command line because current rustup does
+not accept a host in `rust-toolchain.toml`; that file only pins `stable`. The crate has no
+dependencies; the Win32 declarations are hand-written in `src/sys.rs`.
 
 ## Install and remove
 
