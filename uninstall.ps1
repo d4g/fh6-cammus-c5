@@ -4,20 +4,28 @@
 
 .DESCRIPTION
     Windows PowerShell 5.1. Run with FH6 closed. Files without a backup are left alone; Steam's
-    "Verify integrity of game files" restores them as well. The backups stay in place.
+    "Verify integrity of game files" (Xbox app: "Verify and repair") restores them as well. The
+    backups stay in place.
 
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File uninstall.ps1
 #>
 [CmdletBinding()]
 param(
-    [string]$GameDir,   # default: $env:FH6_DIR, else found through Steam (fh6-path.ps1)
-    [string]$BackupDir = $(if ($env:FH6_BACKUP_DIR) { $env:FH6_BACKUP_DIR } else { "$env:USERPROFILE\fh6-backup" })
+    [string]$GameDir,   # default: $env:FH6_DIR, else found through Steam or Game Pass (fh6-path.ps1)
+    [string]$BackupDir  # default: Get-Fh6BackupDir in fh6-path.ps1, the same as install.ps1
 )
 
 $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\fh6-path.ps1"
 if (-not $GameDir) { $GameDir = Find-Fh6Dir }
+if (-not $BackupDir) {
+    $BackupDir = Get-Fh6BackupDir $GameDir
+    # Installs from before the per-build folders kept their backups in fh6-backup itself.
+    if (-not (Test-Path -LiteralPath $BackupDir) -and (Test-Path -LiteralPath "$Fh6BackupRoot\inputmappingprofiles.zip")) {
+        $BackupDir = $Fh6BackupRoot
+    }
+}
 Write-Host "Game folder:   $GameDir"
 Write-Host "Backup folder: $BackupDir"
 if (Get-Process forzahorizon6 -ErrorAction SilentlyContinue) { throw 'Forza Horizon 6 is running. Close it first.' }
@@ -38,7 +46,7 @@ foreach ($pair in $restore) {
     }
 }
 
-foreach ($f in @('xinput1_3.dll', 'fh6-ffb-fix.dedupe', 'fh6-ffb-fix.verbose')) {
+foreach ($f in @('xinput1_3.dll', 'xinput1_4.dll', 'fh6-ffb-fix.dedupe', 'fh6-ffb-fix.verbose')) {
     if (Test-Path -LiteralPath "$GameDir\$f") { Remove-Item -LiteralPath "$GameDir\$f"; Write-Host "removed $f" }
 }
 Write-Host 'Done. In FH6, pick another wheel layout if CammusC5CP5 was selected.'

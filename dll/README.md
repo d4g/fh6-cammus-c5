@@ -12,10 +12,12 @@ In short: Windows' FFB broker sends FH6's effects as **2-axis polar effects over
 
 ## What the DLL does
 
-1. FH6 imports `XINPUT1_3.dll`, which the game does not ship, so Windows loads this proxy
-   from the game folder first. Every XInput export is forwarded to the genuine
-   `C:\Windows\System32\xinput1_3.dll`, loaded by full path (a bare name would find the
-   proxy again). Controllers keep working.
+1. FH6 imports `XINPUT1_3.dll` (Steam) or `XINPUT1_4.dll` (Game Pass), which the game does
+   not ship, so Windows loads this proxy from the game folder first; `install.ps1` copies it
+   under the matching name. Every XInput export is forwarded to the genuine System32 DLL of
+   the same name, loaded by full path (a bare name would find the proxy again). The export
+   table is the union of both DLLs, whose ordinals agree; an export the genuine DLL lacks
+   returns "not connected". Controllers keep working.
 2. On load it registers a DLL-load notification. When `pid.dll` is mapped, a worker
    thread asks `pid.dll` for one driver instance (`DllGetClassObject` with CLSID
    `{EEC6993A-B3FD-11D2-A916-00C04FB98638}`, then `CreateInstance`) to read the vtable

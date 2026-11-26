@@ -1,6 +1,7 @@
-; Export table of the proxy. Ordinals match C:\Windows\System32\xinput1_3.dll
-; (10.0.26200.1): FH6 imports ordinals 2 and 4 BY ORDINAL, not by name, so the
-; numbers are load-bearing. 100-103 are the undocumented name-less exports.
+; Export table of the proxy: the union of C:\Windows\System32\xinput1_3.dll and
+; xinput1_4.dll (10.0.26100), whose ordinals agree, so one build serves as either.
+; FH6 imports ordinals 2 and 4 BY ORDINAL, not by name, so the numbers are
+; load-bearing. 100-104 and 108-109 are the undocumented name-less exports.
 LIBRARY xinput1_3.dll
 EXPORTS
     XInputGetState                  @2
@@ -10,7 +11,11 @@ EXPORTS
     XInputGetDSoundAudioDeviceGuids @6
     XInputGetBatteryInformation     @7
     XInputGetKeystroke              @8
+    XInputGetAudioDeviceIds         @10
     XInputGetStateEx                @100 NONAME
     XInputWaitForGuideButton        @101 NONAME
     XInputCancelGuideButtonWait     @102 NONAME
     XInputPowerOffController        @103 NONAME
+    XInputGetBaseBusInformation     @104 NONAME
+    XInputGetCapabilitiesEx         @108 NONAME
+    XInputOrdinal109                @109 NONAME

@@ -1,8 +1,9 @@
-# Cammus C5 + CP5 in Forza Horizon 6 (Steam, PC)
+# Cammus C5 + CP5 in Forza Horizon 6 (PC: Steam or Game Pass)
 
 A working setup for the Cammus C5 direct-drive base in Forza Horizon 6: force feedback, the
 C5 rim's buttons and the CP5 pedals, and the rim's display and LEDs fed by telemetry. Tested
-2026-10-23 with FH6 build 461691 (6.461, Steam) on Windows 11.
+2026-10-23 with FH6 build 461691 (6.461, Steam) on Windows 11, and 2026-11-25 with the Game
+Pass / Microsoft Store version 3.483.970.0 (see [Game Pass](#game-pass)).
 
 **The main advantage: no Cammus Forza helper.** FH6 talks to the wheel directly, without the
 Forza / Horizon helper mode of the Cammus app, so without the frame drops users report with
@@ -15,9 +16,9 @@ Cammus app itself keeps running for the rim's display and LEDs.
 > files. FH6 ships no anti-cheat files, but that is no guarantee for online play. Use at your
 > own risk; everything can be undone (see [Undo](#undo)).
 
-> **After every FH6 update, and after Steam's "Verify integrity of game files": run
-> `install.cmd` again.** Both restore the game's files, which removes the profile and its
-> label; the DLL stays. After an **update**, delete the old backups first (see
+> **After every FH6 update, and after Steam's "Verify integrity of game files" (Xbox app:
+> "Verify and repair"): run `install.cmd` again.** Both restore the game's files, which
+> removes the profile and its label; the DLL stays (see
 > [After an update](#after-an-fh6-update-or-verify-integrity-of-game-files)).
 
 ## Hardware
@@ -38,9 +39,9 @@ Another Cammus base has another PID; the profile is written for these IDs.
 
 | # | Part | Where | Needed for |
 |---|---|---|---|
-| 1 | `xinput1_3.dll` proxy | FH6 game folder | FFB at all: stops the crash in Windows' `pid.dll`, switches the motor on |
+| 1 | `xinput1_3.dll` proxy (Game Pass: as `xinput1_4.dll`) | FH6 game folder | FFB at all: stops the crash in Windows' `pid.dll`, switches the motor on |
 | 2 | Mapping profile in the **Logitech G29 slot** | `media\inputmappingprofiles.zip` | FH6 using the base for FFB although the pedals are "Device 1"; the button layout |
-| 3 | Profile label "CammusC5CP5" | `media\Stripped\StringTables\EN.zip`, `DE.zip` | cosmetic: the name shown instead of "Logitech G29" |
+| 3 | Profile label "CammusC5CP5" | `media\Stripped\StringTables\*.zip` (every installed language) | cosmetic: the name shown instead of "Logitech G29" |
 
 Then two things are set by hand: the in-game settings and the Cammus app (below).
 
@@ -54,14 +55,15 @@ Then two things are set by hand: the in-game settings and the Cammus app (below)
 3. Double-click **`install.cmd`** in the extracted folder. It shows the game folder it found
    and what it changed, and waits for a key at the end.
 
-   The game folder is found through Steam (its entry for FH6, else its library list). To
-   choose it yourself, run in a terminal
+   The game folder is found through Steam (its entry for FH6, else its library list), else
+   through Windows' entry for the Game Pass package. To choose it yourself, run in a terminal
    `install.cmd -GameDir "D:\SteamLibrary\steamapps\common\ForzaHorizon6"`, or set the
    environment variable `FH6_DIR`. Untouched copies of the changed game files go to
-   `%USERPROFILE%\fh6-backup` (`-BackupDir` or `FH6_BACKUP_DIR` to change); the script only
+   a folder per game build in `%USERPROFILE%\fh6-backup` (`steam-<buildid>` or
+   `gamepass-<version>`; `-BackupDir` or `FH6_BACKUP_DIR` to change); the script only
    backs up files that are still original and refuses otherwise.
    Other options: `-Label` (at most 12 bytes), `-Languages` (string tables for the label,
-   default `EN, DE`), `-SkipDll`, `-SkipProfile`, `-SkipLabel`. `install.cmd` runs
+   e.g. `EN, DE`; default every installed language), `-SkipDll`, `-SkipProfile`, `-SkipLabel`. `install.cmd` runs
    `install.ps1`, which needs only Windows PowerShell 5.1.
 4. Make the in-game settings and the Cammus settings below.
 
@@ -105,7 +107,7 @@ Cammus app listens on while FH6 runs). FH6 sends only while driving.
   nor Cammus's `horizonHelper` (a vJoy relay written for an older base) is used, and with them
   go the frame drops users report. It must stay off, not just unused: the helper mode is built
   to write Cammus's own versions of the game's profile zips, which would undo part 2. Start
-  FH6 directly through Steam.
+  FH6 directly through Steam or the Xbox app.
 - Windows' "preferred device" in `joy.cpl` makes no difference to FH6 (FH6 orders devices by
   Windows.Gaming.Input, where the pedals come first).
 
@@ -131,11 +133,16 @@ forward/back scrubbing).
 Both restore the game's zips and string tables, which removes parts 2 and 3. The DLL is not a
 game file and stays.
 
-- **After "Verify integrity of game files":** run `install.cmd` again.
-- **After an FH6 update:** delete the old copies in `%USERPROFILE%\fh6-backup` (or your
-  `-BackupDir`) first, since they belong to the previous version, then run `install.cmd`; it
-  backs up the new originals. If the update changed a file in a way the script does not
-  expect, it stops with a message before changing that file.
+- **After "Verify integrity of game files"** (Xbox app: **"Verify and repair"**): run
+  `install.cmd` again.
+- **After an FH6 update:** run `install.cmd` again. Backups are kept per game build, so it
+  backs up the new originals by itself; folders of old builds in `%USERPROFILE%\fh6-backup`
+  can be deleted. On Game Pass the Xbox app installs updates in the background: if the wheel
+  layout is back to "Logitech G29", an update has run. With your own `-BackupDir` or
+  `FH6_BACKUP_DIR`, or if the build cannot be read, delete the old copies there first.
+
+If the update changed a file in a way the script does not expect, it stops with a message
+before changing that file.
 
 Check that the DLL still patches: `%TEMP%\fh6-ffb-fix.log` should start with
 `patched pid.dll …` after a game start.
@@ -144,7 +151,29 @@ Check that the DLL still patches: `%TEMP%\fh6-ffb-fix.log` should start with
 
 Double-click **`uninstall.cmd`**. It restores the backed-up game files and removes the DLL
 (same `-GameDir` / `-BackupDir` options as `install.cmd`). Steam's "Verify integrity of game files" restores the game files too, but
-leaves the DLL.
+leaves the DLL; so does the Xbox app's "Verify and repair".
+
+## Game Pass
+
+The Game Pass / Microsoft Store version is the package `Microsoft.ForteBaseGame`. The
+installer asks Windows for its folder (`Get-AppxPackage`), so it finds the game on any drive
+or library folder without guessing. That entry points into `C:\Program Files\WindowsApps`,
+which links (junctions) to the folder chosen in the Xbox app, e.g.
+`D:\XboxGames\Forza Horizon 6\Content`; the installer follows the links and works on that
+folder. No administrator rights are needed: the game folder is writable for the user.
+
+Differences from Steam:
+
+- The Game Pass build imports `xinput1_4.dll` instead of `xinput1_3.dll`, so the installer
+  copies the proxy under that name. Without it the game crashes in `pid.dll` at start, as
+  described in [docs/how-it-works.md](docs/how-it-works.md).
+- Restore the game files with Xbox app → Forza Horizon 6 → **Manage → Files → Verify and
+  repair**.
+- Updates install in the background; run `install.cmd` after each one (see
+  [After an update](#after-an-fh6-update-or-verify-integrity-of-game-files)).
+- Only downloaded language packs have string tables; the others are empty placeholder
+  files, which the label step leaves alone.
+- If both versions are installed, Steam's is found first; pass `-GameDir` for the other.
 
 ## Development
 

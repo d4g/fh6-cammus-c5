@@ -1,7 +1,8 @@
-//! `xinput1_3.dll` proxy for Forza Horizon 6. FH6 imports XINPUT1_3.dll and the game
-//! folder is searched before System32, so this DLL is loaded into the game. It
-//! forwards every XInput call to the real System32 DLL and, as a side effect of being
-//! loaded, installs the force-feedback repair from [`hook`].
+//! XInput proxy for Forza Horizon 6. The Steam build imports XINPUT1_3.dll, the Game Pass
+//! build XINPUT1_4.dll; the game folder is searched before System32, so this DLL, copied
+//! under the matching name, is loaded into the game. It forwards every XInput call to
+//! the System32 DLL of the same name and, as a side effect of being loaded, installs the
+//! force-feedback repair from [`hook`].
 
 #[cfg(not(target_pointer_width = "64"))]
 compile_error!("FH6 is x64 only; the DIEFFECT layout and the export forwarding assume it");
@@ -11,13 +12,18 @@ pub mod repair;
 mod sys;
 
 use std::ffi::{c_void, CStr};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::OnceLock;
 use sys::*;
+
+/// This proxy's own module handle, to tell which name it was loaded under.
+static SELF_MODULE: AtomicUsize = AtomicUsize::new(0);
 
 #[no_mangle]
 pub extern "system" fn DllMain(module: *mut c_void, reason: u32, _reserved: *mut c_void) -> i32 {
     const DLL_PROCESS_ATTACH: u32 = 1;
     if reason == DLL_PROCESS_ATTACH {
+        SELF_MODULE.store(module as usize, Ordering::Relaxed);
         unsafe { DisableThreadLibraryCalls(module) };
         let _ = std::panic::catch_unwind(hook::init);
     }
@@ -29,7 +35,8 @@ enum Sym {
     Ordinal(u16),
 }
 
-/// The genuine `xinput1_3.dll`, loaded by full path: a bare name would find this proxy.
+/// The genuine System32 DLL this proxy stands in for (`xinput1_4.dll` when loaded under
+/// that name, else `xinput1_3.dll`), loaded by full path: a bare name would find this proxy.
 fn real_module() -> usize {
     static MODULE: OnceLock<usize> = OnceLock::new();
     *MODULE.get_or_init(|| unsafe {
@@ -38,8 +45,10 @@ fn real_module() -> usize {
         if len == 0 || len >= dir.len() {
             return 0;
         }
+        let me = SELF_MODULE.load(Ordering::Relaxed);
+        let is_1_4 = me != 0 && GetModuleHandleW(wide("xinput1_4.dll").as_ptr()) as usize == me;
         let mut path = String::from_utf16_lossy(&dir[..len]);
-        path.push_str("\\xinput1_3.dll");
+        path.push_str(if is_1_4 { "\\xinput1_4.dll" } else { "\\xinput1_3.dll" });
         LoadLibraryW(wide(&path).as_ptr()) as usize
     })
 }
@@ -89,3 +98,10 @@ forward!(Sym::Ordinal(100), fn XInputGetStateEx(a: usize, b: usize, c: usize, d:
 forward!(Sym::Ordinal(101), fn XInputWaitForGuideButton(a: usize, b: usize, c: usize, d: usize) -> usize, missing = ERROR_DEVICE_NOT_CONNECTED as usize);
 forward!(Sym::Ordinal(102), fn XInputCancelGuideButtonWait(a: usize, b: usize, c: usize, d: usize) -> usize, missing = ERROR_DEVICE_NOT_CONNECTED as usize);
 forward!(Sym::Ordinal(103), fn XInputPowerOffController(a: usize, b: usize, c: usize, d: usize) -> usize, missing = ERROR_DEVICE_NOT_CONNECTED as usize);
+
+// xinput1_4 only. Under the other name these resolve to nothing and return `missing`, as
+// XInputGetDSoundAudioDeviceGuids does under the xinput1_4 name.
+forward!(Sym::Name(c"XInputGetAudioDeviceIds"), fn XInputGetAudioDeviceIds(index: u32, render_id: *mut u16, render_count: *mut u32, capture_id: *mut u16, capture_count: *mut u32) -> u32, missing = ERROR_DEVICE_NOT_CONNECTED);
+forward!(Sym::Ordinal(104), fn XInputGetBaseBusInformation(a: usize, b: usize, c: usize, d: usize) -> usize, missing = ERROR_DEVICE_NOT_CONNECTED as usize);
+forward!(Sym::Ordinal(108), fn XInputGetCapabilitiesEx(a: usize, b: usize, c: usize, d: usize) -> usize, missing = ERROR_DEVICE_NOT_CONNECTED as usize);
+forward!(Sym::Ordinal(109), fn XInputOrdinal109(a: usize, b: usize, c: usize, d: usize) -> usize, missing = ERROR_DEVICE_NOT_CONNECTED as usize);
